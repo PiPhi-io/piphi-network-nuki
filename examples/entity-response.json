@@ -1,0 +1,45 @@
+{
+  "entities": [
+    {
+      "id": "nuki-access-device",
+      "name": "Nuki Access Device",
+      "device_id": "nuki-access-device",
+      "entity_type": "smart_lock",
+      "capabilities": [
+        "connected",
+        "refresh"
+      ],
+      "available_commands": [
+        {
+          "id": "refresh",
+          "label": "Refresh",
+          "kind": "action"
+        }
+      ],
+      "dashboard": {
+        "allowed_widgets": [
+          "access-control-card",
+          "battery-fleet-card",
+          "tile",
+          "button"
+        ],
+        "default_widget": "access-control-card"
+      }
+    }
+  ],
+  "capabilities": {
+    "connected": {
+      "kind": "sensor",
+      "unit": "bool"
+    },
+    "refresh": {
+      "kind": "action"
+    }
+  },
+  "commands": {
+    "refresh": {
+      "description": "Refresh the integration state.",
+      "timeout_ms": 5000
+    }
+  }
+}

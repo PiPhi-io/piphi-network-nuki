@@ -1,0 +1,10 @@
+{
+  "id": "nuki-home",
+  "host": "api.nuki.io",
+  "alias": "Home Locks",
+  "api_token": "change-me",
+  "webhook_secret": "change-me",
+  "transport": "web",
+  "actions_enabled": false,
+  "allowed_lock_ids": []
+}

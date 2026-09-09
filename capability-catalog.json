@@ -1,0 +1,285 @@
+{
+  "catalog_version": "1.0",
+  "integration_id": "piphi-network-nuki",
+  "coverage_mode": "upstream-surface-accounted-runtime-advertising-gated-by-implementation",
+  "reviewed_at": "2026-09-09",
+  "sources": {
+    "nuki_web_api": "https://developer.nuki.io/uploads/short-url/la3JC7hC7Z6Fv7DHQNWKSNTK85S.pdf",
+    "nuki_webhooks": "https://developer.nuki.io/uploads/short-url/kV03UliU4WPsO0Xtd3cXkQQdTa9.pdf",
+    "nuki_mqtt": "https://developer.nuki.io/t/mqtt-api-specification-v1-3/17626",
+    "homey_reference": "https://homey.app/en-us/app/io.nuki/Nuki/",
+    "core_vocabulary": "PiPhi Network Core capability and behavior contracts"
+  },
+  "groups": [
+    {
+      "id": "runtime-foundation",
+      "status": "implemented",
+      "scope": [
+        "all-configurations"
+      ],
+      "source_refs": [
+        "core_vocabulary"
+      ],
+      "reason": "The scaffold implements configuration lifecycle, connectivity state, refresh dispatch, and a configuration event.",
+      "state": [
+        "connected"
+      ],
+      "events": [
+        "runtime.config.applied"
+      ],
+      "conditions": [
+        "state_matches"
+      ],
+      "actions": [
+        "refresh"
+      ]
+    },
+    {
+      "id": "device-discovery-and-models",
+      "status": "planned",
+      "scope": [
+        "web-mqtt-and-matter-configurations"
+      ],
+      "source_refs": [
+        "nuki_web_api",
+        "nuki_mqtt",
+        "homey_reference"
+      ],
+      "reason": "Smart Lock generations, Ultra, Go, Pro, MQTT locks, and Opener require transport and feature negotiation.",
+      "state": [
+        "device_type",
+        "device_name",
+        "device_id",
+        "firmware_version",
+        "hardware_revision",
+        "transport",
+        "server_state",
+        "admin_pin_state",
+        "last_seen_at"
+      ],
+      "events": [
+        "device.discovered",
+        "device.online",
+        "device.offline"
+      ],
+      "conditions": [
+        "device_type_is",
+        "transport_is",
+        "device_is_online"
+      ],
+      "actions": []
+    },
+    {
+      "id": "lock-and-opener-state",
+      "status": "planned",
+      "scope": [
+        "smart-locks-and-openers"
+      ],
+      "source_refs": [
+        "nuki_web_api",
+        "homey_reference"
+      ],
+      "reason": "Lock state, opener mode, unlatch, Lock'n'Go, ring-to-open, and completion results need model-aware mapping.",
+      "state": [
+        "lock_state",
+        "lock_state_name",
+        "door_mode",
+        "ring_to_open_active",
+        "ring_to_open_timer",
+        "night_mode",
+        "last_lock_action",
+        "last_lock_action_trigger",
+        "last_action_completed_at"
+      ],
+      "events": [
+        "lock.locked",
+        "lock.unlocked",
+        "lock.unlatched",
+        "lock.action_failed",
+        "opener.ring_detected",
+        "opener.ring_to_open_changed"
+      ],
+      "conditions": [
+        "lock_is_locked",
+        "lock_is_unlocked",
+        "ring_to_open_is_active"
+      ],
+      "actions": [
+        "lock",
+        "unlock",
+        "unlatch",
+        "lock_n_go",
+        "activate_ring_to_open",
+        "deactivate_ring_to_open"
+      ]
+    },
+    {
+      "id": "door-battery-and-maintenance",
+      "status": "planned",
+      "scope": [
+        "devices-advertising-each-feature"
+      ],
+      "source_refs": [
+        "nuki_web_api",
+        "homey_reference"
+      ],
+      "reason": "Door sensor, battery, charging, keypad, and maintenance fields vary by generation and accessory.",
+      "state": [
+        "door_state",
+        "door_sensor_available",
+        "battery_percent",
+        "battery_critical",
+        "keypad_battery_critical",
+        "door_sensor_battery_critical",
+        "battery_charging",
+        "battery_type",
+        "successor_update_recommended"
+      ],
+      "events": [
+        "door.opened",
+        "door.closed",
+        "door.sensor_jammed",
+        "battery.low",
+        "battery.recovered"
+      ],
+      "conditions": [
+        "door_is_open",
+        "battery_below",
+        "battery_is_charging"
+      ],
+      "actions": []
+    },
+    {
+      "id": "authorization-keypad-and-logs",
+      "status": "planned",
+      "scope": [
+        "accounts-with-smartlock-auth-and-log-scopes"
+      ],
+      "source_refs": [
+        "nuki_web_api",
+        "nuki_mqtt",
+        "homey_reference"
+      ],
+      "reason": "Authorizations, keypad codes, fingerprints, schedules, and logs contain sensitive access metadata and need least-privilege filtering.",
+      "state": [
+        "authorization_count",
+        "keypad_code_count",
+        "last_actor_id",
+        "last_code_id",
+        "last_access_method",
+        "last_access_result"
+      ],
+      "events": [
+        "access.granted",
+        "access.denied",
+        "keypad.code_used",
+        "fingerprint.used",
+        "button.pressed"
+      ],
+      "conditions": [
+        "access_method_is",
+        "authorization_is_enabled"
+      ],
+      "actions": [
+        "create_keypad_code",
+        "update_keypad_code",
+        "delete_keypad_code",
+        "enable_authorization",
+        "disable_authorization"
+      ]
+    },
+    {
+      "id": "webhooks-and-delivery",
+      "status": "planned",
+      "scope": [
+        "web-api-configurations"
+      ],
+      "source_refs": [
+        "nuki_webhooks"
+      ],
+      "reason": "Central and decentral webhooks require signature verification, replay protection, registration reconciliation, and bounded deduplication.",
+      "state": [
+        "webhook_registered",
+        "webhook_last_received_at",
+        "webhook_delivery_lag_ms",
+        "webhook_signature_valid"
+      ],
+      "events": [
+        "webhook.received",
+        "webhook.signature_rejected",
+        "webhook.replay_rejected",
+        "webhook.registration_changed"
+      ],
+      "conditions": [
+        "webhook_is_healthy"
+      ],
+      "actions": [
+        "reconcile_webhook"
+      ]
+    },
+    {
+      "id": "permissions-diagnostics-and-recovery",
+      "status": "planned",
+      "scope": [
+        "all-configurations"
+      ],
+      "source_refs": [
+        "nuki_web_api",
+        "nuki_webhooks",
+        "nuki_mqtt"
+      ],
+      "reason": "Scope negotiation, authentication expiry, MQTT health, command correlation, quotas, retries, and recovery need explicit diagnostics.",
+      "state": [
+        "granted_scopes",
+        "actions_enabled",
+        "api_latency_ms",
+        "mqtt_connected",
+        "last_error_code",
+        "last_success_at",
+        "command_pending",
+        "command_result"
+      ],
+      "events": [
+        "authentication.expired",
+        "authentication.recovered",
+        "command.timed_out"
+      ],
+      "conditions": [
+        "actions_are_enabled",
+        "permission_is_granted",
+        "data_is_stale"
+      ],
+      "actions": [
+        "reconnect",
+        "resynchronize_state"
+      ]
+    },
+    {
+      "id": "unsafe-or-sensitive-surface",
+      "status": "excluded",
+      "scope": [
+        "all-devices-and-accounts"
+      ],
+      "source_refs": [
+        "nuki_web_api",
+        "nuki_webhooks"
+      ],
+      "reason": "Tokens, secrets, admin PINs, raw access logs, unbounded authorization export, and non-allowlisted lock actions must not be exposed.",
+      "state": [
+        "api_token",
+        "webhook_secret",
+        "admin_pin",
+        "raw_access_log",
+        "raw_keypad_code"
+      ],
+      "events": [],
+      "conditions": [],
+      "actions": [
+        "execute_arbitrary_lock_action",
+        "export_all_access_credentials",
+        "set_admin_pin",
+        "unlock_unallowlisted_lock"
+      ]
+    }
+  ]
+}

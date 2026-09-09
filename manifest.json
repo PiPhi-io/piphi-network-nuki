@@ -1,0 +1,141 @@
+{
+  "$schema": "./schema/piphi-manifest.schema.json",
+  "manifest_version": "1.0",
+  "id": "piphi-network-nuki",
+  "name": "PiPhi Network Nuki",
+  "version": "0.1.0",
+  "description": "Nuki access integration for Smart Locks and Openers across Web API, MQTT, and Matter-capable models.",
+  "metadata": {
+    "generator": "piphi-network-create",
+    "scaffold_version": "0.3.0",
+    "preset": "webhook-receiver",
+    "domain": "cloud-api",
+    "preset_summary": "Webhook receiver starter with signed inbound event handling."
+  },
+  "maintainer": {
+    "name": "PiPhi Network",
+    "website": "https://piphi.io"
+  },
+  "license": "Apache-2.0",
+  "image": "docker.io/piphinetwork/piphi-network-nuki:0.1.0",
+  "platforms": [
+    "linux"
+  ],
+  "runtime": {
+    "linux": {
+      "type": "container",
+      "container": {
+        "image": "docker.io/piphinetwork/piphi-network-nuki:0.1.0",
+        "ports": [
+          {
+            "container": 4226,
+            "host": 4226
+          }
+        ],
+        "environment": {
+          "LOG_LEVEL": "info"
+        },
+        "restart_policy": {
+          "name": "unless-stopped",
+          "maximum_retry_count": 0
+        }
+      },
+      "discovery": {
+        "method": "passive"
+      }
+    }
+  },
+  "api": {
+    "required": [
+      "health",
+      "entities",
+      "command",
+      "config",
+      "ui_config"
+    ],
+    "endpoints": {
+      "health": "/health",
+      "diagnostics": "/diagnostics",
+      "discover": "/discover",
+      "entities": "/entities",
+      "state": "/state",
+      "config": "/config",
+      "config_sync": "/config/sync",
+      "deconfigure": "/deconfigure",
+      "ui_config": "/ui-config",
+      "events": "/events",
+      "command": "/command"
+    }
+  },
+  "config": {
+    "source": "endpoint",
+    "endpoint": "/ui-config",
+    "required": true,
+    "editable_fields": [
+      "host",
+      "alias",
+      "api_token",
+      "webhook_secret",
+      "transport",
+      "actions_enabled",
+      "allowed_lock_ids"
+    ],
+    "runtime_fields": [
+      "id",
+      "config_id",
+      "container_id",
+      "device_id"
+    ],
+    "identity_fields": [
+      "host"
+    ]
+  },
+  "identity": {
+    "fields": [
+      "host"
+    ]
+  },
+  "capabilities": {
+    "connected": {
+      "kind": "sensor",
+      "unit": "bool"
+    },
+    "refresh": {
+      "kind": "action"
+    }
+  },
+  "commands": {
+    "refresh": {
+      "description": "Refresh the integration state.",
+      "timeout_ms": 5000
+    }
+  },
+  "entities": [
+    {
+      "id": "nuki-access-device",
+      "name": "Nuki Access Device",
+      "device_id": "nuki-access-device",
+      "entity_type": "smart_lock",
+      "capabilities": [
+        "connected",
+        "refresh"
+      ],
+      "available_commands": [
+        {
+          "id": "refresh",
+          "label": "Refresh",
+          "kind": "action"
+        }
+      ],
+      "dashboard": {
+        "allowed_widgets": [
+          "access-control-card",
+          "battery-fleet-card",
+          "tile",
+          "button"
+        ],
+        "default_widget": "access-control-card"
+      }
+    }
+  ]
+}
